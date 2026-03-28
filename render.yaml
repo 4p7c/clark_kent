@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: faselhd-stremio-addon
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    routes:
+      - path: /
+        destination: /
+      - path: /api/stremio/*
+        destination: /api/stremio/*
+      - path: /api/trpc/*
+        destination: /api/trpc/*
