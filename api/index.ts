@@ -10,13 +10,19 @@ export default async function handler(
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Content-Type", "application/json");
 
+  const url = req.url || "";
+
   // Handle OPTIONS preflight
   if (req.method === "OPTIONS") {
     return res.writeHead(200).end();
   }
 
-  // Manifest endpoint
-  if (req.url === "/api/stremio/manifest.json" || req.url === "/manifest.json") {
+  // Manifest endpoint - handle multiple path patterns
+  if (
+    url === "/api/stremio/manifest.json" ||
+    url === "/manifest.json" ||
+    url.endsWith("/manifest.json")
+  ) {
     const manifest = {
       id: "org.faselhd.stremio",
       version: "1.0.0",
@@ -38,23 +44,31 @@ export default async function handler(
         configurationRequired: false,
       },
     };
-    return res.writeHead(200).end(JSON.stringify(manifest));
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify(manifest));
   }
 
   // Health check
-  if (req.url === "/api/health") {
-    return res.writeHead(200).end(
+  if (url.includes("/health")) {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(
       JSON.stringify({ status: "ok", addon: "FaselHD Stremio Addon" })
     );
   }
 
-  // Stream endpoint placeholder
-  if (req.url?.includes("/api/stremio/stream/")) {
-    return res.writeHead(200).end(JSON.stringify({ streams: [] }));
+  // Stream endpoint
+  if (url.includes("/stream/")) {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({ streams: [] }));
   }
 
-  // Default response
-  return res
-    .writeHead(200)
-    .end(JSON.stringify({ message: "FaselHD Stremio Addon is running" }));
+  // Default 404 response with info
+  res.writeHead(404, { "Content-Type": "application/json" });
+  return res.end(
+    JSON.stringify({
+      error: "Not found",
+      message: "FaselHD Stremio Addon - Use /api/stremio/manifest.json",
+      path: url,
+    })
+  );
 }
