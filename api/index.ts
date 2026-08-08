@@ -1,13 +1,14 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import type { Express, Request, Response } from "express";
 import stremioMiddleware from "../../server/stremio-middleware";
 
-const app = express();
+const app: Express = express();
 
 // CORS middleware
 app.use((req: Request, res: Response, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
