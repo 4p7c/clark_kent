@@ -5,25 +5,9 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "routes": [
-    {
-      "src": "/api/stremio/(.*)",
-      "dest": "/server/_core/index.ts",
-      "methods": ["GET", "POST", "OPTIONS"]
-    },
-    {
-      "src": "/api/trpc/(.*)",
-      "dest": "/server/_core/index.ts",
-      "methods": ["GET", "POST", "OPTIONS"]
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/server/_core/index.ts"
-    }
-  ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -38,12 +22,8 @@
           "value": "Content-Type, Authorization, X-Requested-With"
         },
         {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "false"
-        },
-        {
-          "key": "Access-Control-Max-Age",
-          "value": "86400"
+          "key": "Content-Type",
+          "value": "application/json"
         }
       ]
     }
