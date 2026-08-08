@@ -1,22 +1,23 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { IncomingMessage, ServerResponse } from "http";
 
 export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
+  req: IncomingMessage & { url?: string; method?: string },
+  res: ServerResponse
 ) {
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Content-Type", "application/json");
 
   // Handle OPTIONS preflight
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.writeHead(200).end();
   }
 
   // Manifest endpoint
   if (req.url === "/api/stremio/manifest.json" || req.url === "/manifest.json") {
-    return res.status(200).json({
+    const manifest = {
       id: "org.faselhd.stremio",
       version: "1.0.0",
       name: "FaselHD Stremio Addon",
@@ -36,19 +37,24 @@ export default async function handler(
         configurable: true,
         configurationRequired: false,
       },
-    });
+    };
+    return res.writeHead(200).end(JSON.stringify(manifest));
   }
 
   // Health check
   if (req.url === "/api/health") {
-    return res.status(200).json({ status: "ok", addon: "FaselHD Stremio Addon" });
+    return res.writeHead(200).end(
+      JSON.stringify({ status: "ok", addon: "FaselHD Stremio Addon" })
+    );
   }
 
   // Stream endpoint placeholder
   if (req.url?.includes("/api/stremio/stream/")) {
-    return res.status(200).json({ streams: [] });
+    return res.writeHead(200).end(JSON.stringify({ streams: [] }));
   }
 
   // Default response
-  return res.status(200).json({ message: "FaselHD Stremio Addon is running" });
+  return res
+    .writeHead(200)
+    .end(JSON.stringify({ message: "FaselHD Stremio Addon is running" }));
 }
